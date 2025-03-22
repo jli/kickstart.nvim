@@ -208,6 +208,70 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+------------------ JOHN STUFF START ------------------
+
+-- easy config reloading
+-- vim.keymap.set('n', '<leader>r', ':source $MYVIMRC<CR>')
+-- for lazy.nvim, need:
+vim.keymap.set('n', '<leader>r', function()
+  -- Save all changed buffers
+  vim.cmd 'wall'
+  -- Reload plugins
+  -- generally don't need this?
+  -- vim.cmd 'Lazy sync'
+  -- Restart Neovim in place
+  vim.cmd 'source $MYVIMRC'
+  print 'Config reloaded!'
+end)
+
+-- Basic Telescope setup for file opening, buffer switching
+vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>') -- Find files
+vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>') -- Search in files
+vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>') -- List buffers
+vim.keymap.set('n', '<leader>b', ':Telescope buffers<CR>')
+vim.keymap.set('n', '<leader>fh', ':Telescope help_tags<CR>') -- Help tags
+-- More specialized pickers
+vim.keymap.set('n', '<leader>fo', ':Telescope oldfiles<CR>') -- Recent files
+vim.keymap.set('n', '<leader>fs', ':Telescope grep_string<CR>') -- Search word under cursor
+
+---- zet markdown notes support start ----
+
+vim.opt.suffixesadd:append '.md'
+vim.opt.path:append '.'
+-- Function to follow wiki links
+vim.api.nvim_create_user_command('WikiFollow', function()
+  local line = vim.fn.getline '.'
+  local col = vim.fn.col '.'
+  local text_before = line:sub(1, col)
+  local text_after = line:sub(col)
+
+  -- Find the start and end of the wiki link
+  local start_pos = text_before:match '.*(%[%[)'
+  local end_pos = text_after:match '%]%](.*)'
+
+  if start_pos and end_pos then
+    -- Extract text between [[ and ]]
+    local link_start = #text_before - #start_pos + 2
+    local link_end = #text_after - #end_pos - 2
+    local link_text = text_before:sub(link_start + 1) .. text_after:sub(1, link_end)
+
+    -- Open the file
+    vim.cmd('edit ' .. link_text .. '.md')
+  end
+end, {})
+-- Map it to a key
+vim.api.nvim_set_keymap('n', '<Leader>gf', ':WikiFollow<CR>', { noremap = true })
+
+-- Insert date (YYYY-MM-DD) in normal mode
+vim.keymap.set('n', '<leader>id', 'i<C-R>=strftime("%Y-%m-%d")<CR><Esc>')
+vim.keymap.set('n', '<leader>ia', 'i<C-R>=strftime("%Y-%m-%d %a")<CR><Esc>')
+-- Insert time (HH:MM) in normal mode
+vim.keymap.set('n', '<leader>it', 'i<C-R>=strftime("%H:%M")<CR><Esc>')
+
+---- zet markdown notes support end ----
+
+------------------ JOHN STUFF END --------------------
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
