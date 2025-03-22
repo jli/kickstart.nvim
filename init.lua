@@ -208,7 +208,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
------------------- JOHN STUFF START ------------------
+------------------ JOHNSETUP STUFF START ------------------
 
 -- easy config reloading
 -- vim.keymap.set('n', '<leader>r', ':source $MYVIMRC<CR>')
@@ -235,38 +235,47 @@ vim.keymap.set('n', '<leader>fo', ':Telescope oldfiles<CR>') -- Recent files
 vim.keymap.set('n', '<leader>fs', ':Telescope grep_string<CR>') -- Search word under cursor
 
 ---- zet markdown notes support start ----
-
-vim.opt.suffixesadd:append '.md'
-vim.opt.path:append '.'
--- Function to follow wiki links
-vim.api.nvim_create_user_command('WikiFollow', function()
-  local line = vim.fn.getline '.'
-  local col = vim.fn.col '.'
-  local text_before = line:sub(1, col)
-  local text_after = line:sub(col)
-
-  -- Find the start and end of the wiki link
-  local start_pos = text_before:match '.*(%[%[)'
-  local end_pos = text_after:match '%]%](.*)'
-
-  if start_pos and end_pos then
-    -- Extract text between [[ and ]]
-    local link_start = #text_before - #start_pos + 2
-    local link_end = #text_after - #end_pos - 2
-    local link_text = text_before:sub(link_start + 1) .. text_after:sub(1, link_end)
-
-    -- Open the file
-    vim.cmd('edit ' .. link_text .. '.md')
-  end
-end, {})
--- Map it to a key
-vim.api.nvim_set_keymap('n', '<Leader>gf', ':WikiFollow<CR>', { noremap = true })
+-- for obsidian.nvim stuff
+vim.opt.conceallevel = 1
+-- vim.opt.suffixesadd:append '.md'
+-- vim.opt.path:append '.'
+-- -- Function to follow wiki links
+-- vim.api.nvim_create_user_command('WikiFollow', function()
+--   local line = vim.fn.getline '.'
+--   local col = vim.fn.col '.'
+--   local text_before = line:sub(1, col)
+--   local text_after = line:sub(col)
+--
+--   -- Find the start and end of the wiki link
+--   local start_pos = text_before:match '.*(%[%[)'
+--   local end_pos = text_after:match '%]%](.*)'
+--
+--   if start_pos and end_pos then
+--     -- Extract text between [[ and ]]
+--     local link_start = #text_before - #start_pos + 2
+--     local link_end = #text_after - #end_pos - 2
+--     local link_text = text_before:sub(link_start + 1) .. text_after:sub(1, link_end)
+--
+--     -- Open the file
+--     vim.cmd('edit ' .. link_text .. '.md')
+--   end
+-- end, {})
+-- -- Map it to a key
+-- vim.api.nvim_set_keymap('n', '<Leader>gf', ':WikiFollow<CR>', { noremap = true })
 
 -- Insert date (YYYY-MM-DD) in normal mode
 vim.keymap.set('n', '<leader>id', 'i<C-R>=strftime("%Y-%m-%d")<CR><Esc>')
 vim.keymap.set('n', '<leader>ia', 'i<C-R>=strftime("%Y-%m-%d %a")<CR><Esc>')
 -- Insert time (HH:MM) in normal mode
 vim.keymap.set('n', '<leader>it', 'i<C-R>=strftime("%H:%M")<CR><Esc>')
+
+-- Custom markdown headings picker
+vim.keymap.set('n', '<leader>fm', function()
+  require('telescope.builtin').current_buffer_fuzzy_find {
+    default_text = '^##',
+    prompt_title = 'Markdown Headings',
+  }
+end)
 
 ---- zet markdown notes support end ----
 
@@ -467,6 +476,13 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+        defaults = {
+          mappings = {
+            i = {
+              ['<C-x>'] = 'delete_buffer', -- Custom mapping
+            },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -1067,6 +1083,38 @@ require('lazy').setup({
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
   -- you can continue same window with `<space>sr` which resumes last telescope search
+
+  ---- JOHNSETUP markdown notes
+  {
+    'epwalsh/obsidian.nvim',
+    version = '*', -- recommended, use latest release instead of latest commit
+    lazy = true,
+    ft = 'markdown',
+    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+    -- event = {
+    --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+    --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
+    --   -- refer to `:h file-pattern` for more examples
+    --   "BufReadPre path/to/my-vault/*.md",
+    --   "BufNewFile path/to/my-vault/*.md",
+    -- },
+    dependencies = {
+      -- Required.
+      'nvim-lua/plenary.nvim',
+    },
+    opts = {
+      workspaces = {
+        {
+          name = 'zet',
+          path = '~/src/zet',
+          overrides = {
+            notes_subdir = 'notes',
+          },
+        },
+      },
+      disable_frontmatter = true,
+    },
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
