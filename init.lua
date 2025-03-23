@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -213,7 +213,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- easy config reloading
 -- vim.keymap.set('n', '<leader>r', ':source $MYVIMRC<CR>')
 -- for lazy.nvim, need:
-vim.keymap.set('n', '<leader>r', function()
+vim.keymap.set('n', '<leader>R', function()
   -- Save all changed buffers
   vim.cmd 'wall'
   -- Reload plugins
@@ -222,21 +222,13 @@ vim.keymap.set('n', '<leader>r', function()
   -- Restart Neovim in place
   vim.cmd 'source $MYVIMRC'
   print 'Config reloaded!'
-end)
-
--- Basic Telescope setup for file opening, buffer switching
-vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>') -- Find files
-vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>') -- Search in files
-vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>') -- List buffers
-vim.keymap.set('n', '<leader>b', ':Telescope buffers<CR>')
-vim.keymap.set('n', '<leader>fh', ':Telescope help_tags<CR>') -- Help tags
--- More specialized pickers
-vim.keymap.set('n', '<leader>fo', ':Telescope oldfiles<CR>') -- Recent files
-vim.keymap.set('n', '<leader>fs', ':Telescope grep_string<CR>') -- Search word under cursor
+end, { desc = '[R]eload config' })
 
 ---- zet markdown notes support start ----
 -- for obsidian.nvim stuff
 vim.opt.conceallevel = 1
+
+-- clod-generated wikilink following
 -- vim.opt.suffixesadd:append '.md'
 -- vim.opt.path:append '.'
 -- -- Function to follow wiki links
@@ -263,11 +255,13 @@ vim.opt.conceallevel = 1
 -- -- Map it to a key
 -- vim.api.nvim_set_keymap('n', '<Leader>gf', ':WikiFollow<CR>', { noremap = true })
 
--- Insert date (YYYY-MM-DD) in normal mode
-vim.keymap.set('n', '<leader>id', 'i<C-R>=strftime("%Y-%m-%d")<CR><Esc>')
-vim.keymap.set('n', '<leader>ia', 'i<C-R>=strftime("%Y-%m-%d %a")<CR><Esc>')
--- Insert time (HH:MM) in normal mode
-vim.keymap.set('n', '<leader>it', 'i<C-R>=strftime("%H:%M")<CR><Esc>')
+-- Insert timestamps
+vim.keymap.set('i', '<C-S>d', '<C-r>=strftime("%Y-%m-%d")<CR>')
+vim.keymap.set('n', '<C-S>d', '"=strftime("%Y-%m-%d")<CR>p')
+vim.keymap.set('i', '<C-S>D', '<C-r>=strftime("%Y-%m-%d %a")<CR>')
+vim.keymap.set('n', '<C-S>D', '"=strftime("%Y-%m-%d %a")<CR>p')
+vim.keymap.set('i', '<C-S>t', '<C-r>=strftime("%H:%M")<CR>')
+vim.keymap.set('n', '<C-S>t', '"=strftime("%H:%M")<CR>p')
 
 -- Custom markdown headings picker
 vim.keymap.set('n', '<leader>fm', function()
@@ -363,7 +357,7 @@ require('lazy').setup({
     opts = {
       -- delay between pressing a key and opening which-key (milliseconds)
       -- this setting is independent of vim.opt.timeoutlen
-      delay = 0,
+      delay = 250,
       icons = {
         -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
@@ -476,13 +470,13 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        defaults = {
-          mappings = {
-            i = {
-              ['<C-x>'] = 'delete_buffer', -- Custom mapping
-            },
-          },
-        },
+        -- defaults = {
+        --   mappings = {
+        --     i = {
+        --       ['<C-x>'] = 'delete_buffer', -- Custom mapping
+        --     },
+        --   },
+        -- },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
