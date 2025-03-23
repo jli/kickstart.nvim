@@ -217,8 +217,7 @@ vim.keymap.set('n', '<leader>R', function()
   -- Save all changed buffers
   vim.cmd 'wall'
   -- Reload plugins
-  -- generally don't need this?
-  -- vim.cmd 'Lazy sync'
+  vim.cmd 'Lazy sync'
   -- Restart Neovim in place
   vim.cmd 'source $MYVIMRC'
   print 'Config reloaded!'
@@ -264,12 +263,18 @@ vim.keymap.set('i', '<C-S>t', '<C-r>=strftime("%H:%M")<CR>')
 vim.keymap.set('n', '<C-S>t', '"=strftime("%H:%M")<CR>p')
 
 -- Custom markdown headings picker
-vim.keymap.set('n', '<leader>fm', function()
-  require('telescope.builtin').current_buffer_fuzzy_find {
-    default_text = '^##',
-    prompt_title = 'Markdown Headings',
-  }
-end)
+-- deprecated by ObsidianTOC
+-- vim.keymap.set('n', '<leader>fm', function()
+--   require('telescope.builtin').current_buffer_fuzzy_find {
+--     default_text = '^##',
+--     prompt_title = 'Markdown Headings',
+--   }
+-- end)
+-- obsidian.nvim keymap
+vim.keymap.set('n', '<leader>nt', ':ObsidianTOC<CR>', { desc = '[N]otes [T]OC' })
+vim.keymap.set('n', '<leader>nT', ':ObsidianTemplate<CR>', { desc = '[N]otes [T]emplate' })
+vim.keymap.set('n', '<leader>nb', ':ObsidianBacklinks<CR>', { desc = '[N]otes [B]acklinks' })
+vim.keymap.set('n', '<leader>no', ':ObsidianOpen<CR>', { desc = '[N]otes [O]pen' })
 
 ---- zet markdown notes support end ----
 
@@ -501,6 +506,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -1107,6 +1113,14 @@ require('lazy').setup({
         },
       },
       disable_frontmatter = true,
+      templates = {
+        folder = 'vim_templates',
+        substitutions = {
+          date_with_day = function()
+            return os.date('%Y-%m-%d %a', os.time())
+          end,
+        },
+      },
     },
   },
 }, {
